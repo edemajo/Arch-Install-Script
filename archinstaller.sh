@@ -40,7 +40,7 @@ reflector --download-timeout 20 --latest 25 --age 24 --protocol https --completi
 
 pacman-key --init
 pacman-key --populate archlinux
-pacman -Sy
+pacman -Syy
 pacman -S dialog --noconfirm
 loadkeys it
 timedatectl set-ntp true
@@ -188,15 +188,18 @@ base_system() {
 
     genfstab -U /mnt >> /mnt/etc/fstab
 
-    echo "${hostname}" > /mnt/etc/hostname
-    echo "127.0.0.1	localhost" >> /mnt/etc/hosts
-    echo "::1	localhost" >> /mnt/etc/hosts
-    echo "127.0.1.1	${hostname}.localdomain	${hostname}" >> /mnt/etc/hosts
+    #enter chroot
+    arch-chroot /mnt
+
+    echo "${hostname}" > /etc/hostname
+    echo "127.0.0.1	localhost" >> /etc/hosts
+    echo "::1	localhost" >> /etc/hosts
+    echo "127.0.1.1	${hostname}.localdomain	${hostname}" >> /etc/hosts
 
     ### Timezone ###
     if [ -n "$chosen_timezone" ]; then
-        arch-chroot /mnt ln -sf "/usr/share/zoneinfo/$chosen_timezone" /etc/localtime
-        arch-chroot /mnt hwclock --systohc
+        ln -sf "/usr/share/zoneinfo/$chosen_timezone" /etc/localtime
+         hwclock --systohc
     else
         echo "Nessun fuso orario selezionato."
     fi
@@ -211,39 +214,39 @@ base_system() {
     fi
 
     # Uncomment the chosen locale in /etc/locale.gen
-    arch-chroot /mnt sed -i "s/^#${chosen_locale}/${chosen_locale}/" /etc/locale.gen
+    sed -i "s/^#${chosen_locale}/${chosen_locale}/" /etc/locale.gen
     # Generate the locale
-    arch-chroot /mnt locale-gen
+    locale-gen
 
     # Set the system's locale
     if [[ ${chosen_locale} == *.UTF-8 ]]; then
-        arch-chroot /mnt localectl set-locale LANG=${chosen_locale}
+        localectl set-locale LANG=${chosen_locale}
     else
-        arch-chroot /mnt localectl set-locale LANG=${chosen_locale}.UTF-8
+        localectl set-locale LANG=${chosen_locale}.UTF-8
     fi
 
     # Imposta la configurazione della tastiera per la console
-    echo "KEYMAP=it" > /mnt/etc/vconsole.conf
+    echo "KEYMAP=it" > /etc/vconsole.conf
 
-    arch-chroot /mnt useradd -mG wheel $user
+    useradd -mG wheel $user
 
     ### Fornisce al DE nome e cognome completo dell'utente
-    arch-chroot /mnt usermod -c "$nome $cognome" $user
+    usermod -c "$nome $cognome" $user
 
-    arch-chroot /mnt mkinitcpio -P
+    mkinitcpio -P
 
     # Imposta le password usando il comando passwd
-    echo -e "$password\n$password" | arch-chroot /mnt passwd "$user"
-    echo -e "$password\n$password" | arch-chroot /mnt passwd root
-    echo "$user:$password" | chpasswd --root /mnt
-    echo "root:$password" | chpasswd --root /mnt
+    echo -e "$password\n$password" | passwd "$user"
+    echo -e "$password\n$password" | passwd root
+    echo "$user:$password" | chpasswd --root
+    echo "root:$password" | chpasswd --root
     ### Aggiunge l'utente ai sudoers
-    echo "$user ALL=(ALL) ALL" > /mnt/etc/sudoers.d/$user
+    echo "$user ALL=(ALL) ALL" > /etc/sudoers.d/$user
 
-    arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-    arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+    grub-mkconfig -o /boot/grub/grub.cfg
 
-    arch-chroot /mnt systemctl enable NetworkManager  
+    systemctl enable NetworkManager  
 }
 
 ### restituisce l'output al terminale
