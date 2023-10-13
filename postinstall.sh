@@ -76,14 +76,6 @@ install_DE() {
  #   sudo pacman -Syu amd-ucode nano grub pipewire sudo git vim xf86-video-amdgpu bash-completion man-db man network-manager-applet dialog wpa_supplicant cups xdg-utils xdg-user-dirs mesa xorg xorg-server tlp acpid openssh bluez bluez-utils --needed --noconfirm
 #}
 
-enable_services() {
-    sudo systemctl enable bluetooth
-    sudo systemctl enable sshd
-    sudo systemctl enable tlp
-    sudo systemctl enable fstrim.timer
-    sudo systemctl enable acpid
-}
-
 git clone https://aur.archlinux.org/paru.git
 cd paru
 makepkg -si --noconfirm
@@ -115,7 +107,5 @@ scegli_azione() {
     esac
 }
 
-
 install_DE
-enable_services
 scegli_azione
