@@ -14,13 +14,13 @@ clear
 
 # sudo pacman custom config
 #Add ParallelDownloads under [options]
-sudo sed -i '/\[options\]/a ParallelDownloads = 10' /etc/sudo pacman.conf
+#sudo sed -i '/\[options\]/a ParallelDownloads = 10' /etc/sudo pacman.conf
 #Add ILoveCandy under [options]
-sudo sed -i '/\[options\]/a ILoveCandy' /etc/sudo pacman.conf
+#sudo sed -i '/\[options\]/a ILoveCandy' /etc/sudo pacman.conf
 #Add Color under [options]
-sudo sed -i '/\[options\]/a Color' /etc/sudo pacman.conf
+#sudo sed -i '/\[options\]/a Color' /etc/sudo pacman.conf
 #Enable [multilib]
-sudo sed -i '/#\[multilib\]/,/#include = \/etc\/sudo pacman.d\/mirrorlist/ s/^#//' /etc/sudo pacman.conf
+#sudo sed -i '/#\[multilib\]/,/#include = \/etc\/sudo pacman.d\/mirrorlist/ s/^#//' /etc/sudo pacman.conf
 
 # Xorg keyboard layout configuration
 sudo mkdir -p /etc/X11/xorg.conf.d/
